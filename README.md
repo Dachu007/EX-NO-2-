@@ -34,10 +34,95 @@ STEP-5: Display the obtained cipher text.
 
 
 
-Program:
+## Program:
+```
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+char keyM[5][5];
+
+void makeMatrix(char key[]) {
+    int used[26] = {0}, i, j, k = 0;
+    used['J'-'A'] = 1;
+
+    for(i = 0; key[i]; i++) {
+        if(isalpha(key[i]) && !used[key[i]-'A']) {
+            keyM[k/5][k%5] = key[i];
+            used[key[i]-'A'] = 1;
+            k++;
+        }
+    }
+
+    for(i = 0; i < 26; i++) {
+        if(!used[i]) {
+            keyM[k/5][k%5] = i + 'A';
+            k++;
+        }
+    }
+}
+
+void findPos(char ch, int *r, int *c) {
+    int i, j;
+    if(ch == 'J') ch = 'I';
+    for(i = 0; i < 5; i++)
+        for(j = 0; j < 5; j++)
+            if(keyM[i][j] == ch) {
+                *r = i; *c = j;
+            }
+}
+
+int main() {
+    char key[50], text[50];
+    int i, r1,c1,r2,c2;
+
+    printf("Enter key: ");
+    fgets(key, sizeof(key), stdin);
+    printf("Enter plaintext: ");
+    fgets(text, sizeof(text), stdin);
+
+    for(i = 0; key[i]; i++)
+        if(isalpha(key[i])) key[i] = toupper(key[i]);
+
+    for(i = 0; text[i]; i++)
+        if(isalpha(text[i])) text[i] = toupper(text[i]);
+
+    makeMatrix(key);
+
+    printf("\n5x5 Key Matrix:\n");
+    for(i = 0; i < 5; i++) {
+        for(int j = 0; j < 5; j++) printf("%c ", keyM[i][j]);
+        printf("\n");
+    }
+
+    printf("\nCiphertext: ");
+    for(i = 0; text[i]; i += 2) {
+        if(!isalpha(text[i])) continue;
+
+        if(text[i+1] == '\0' || !isalpha(text[i+1]))
+            text[i+1] = 'X';
+
+        findPos(text[i], &r1, &c1);
+        findPos(text[i+1], &r2, &c2);
+
+        if(r1 == r2)
+            printf("%c%c", keyM[r1][(c1+1)%5], keyM[r2][(c2+1)%5]);
+        else if(c1 == c2)
+            printf("%c%c", keyM[(r1+1)%5][c1], keyM[(r2+1)%5][c2]);
+        else
+            printf("%c%c", keyM[r1][c2], keyM[r2][c1]);
+    }
+
+    return 0;
+}
+
+
+```
 
 
 
+## Output:
+<img width="805" height="316" alt="image" src="https://github.com/user-attachments/assets/a3636299-0c52-430b-90e0-87e7ac8fe911" />
 
-
-Output:
+## Result:
+Thus the implementation of Playfair cipher technique using c program was successfully verified.
